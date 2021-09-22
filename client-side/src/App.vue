@@ -1,26 +1,27 @@
 <template>
   <div id="app-container" :style="appContainerStyle">
-    <StartScreen></StartScreen>
+    <div id="app-container-blur">
+      <Game></Game>
+    </div>
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-import StartScreen from "./components/StartScreen";
+import Game from "./Game";
 
+// Centers and resizes app accordingly
 export default {
   name: 'App',
   components: {
-    // HelloWorld
-    StartScreen
+    Game
   },
   data() {
     return {
       scale: 1,
       defaultWidth: 1920,
       defaultHeight: 1080,
-      width: 1920,
-      height: 1080
+      windowWidth: 1920,
+      windowHeight: 1080
     }
   },
   computed: {
@@ -30,27 +31,27 @@ export default {
         width: this.defaultWidth + "px",
         height: this.defaultHeight + "px",
         transform: "scale(" + this.scale + ")",
-        left: (this.width - this.scale * this.defaultWidth) / 2 + "px",
-        top: (this.height - this.scale * this.defaultHeight) / 2 + "px",
+        left: (this.windowWidth - this.scale * this.defaultWidth) / 2 + "px",
+        top: (this.windowHeight - this.scale * this.defaultHeight) / 2 + "px",
       };
     }
   },
   methods: {
     // updates variables, set up in created()
     onresize() {
-      this.width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      this.height = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
+      this.windowWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      this.windowHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
 
-      let widthScalar = this.width / this.defaultWidth;
-      let heightScalar = this.height / this.defaultHeight;
+      let widthScalar = this.windowWidth / this.defaultWidth;
+      let heightScalar = this.windowHeight / this.defaultHeight;
 
-      // Scale is rounded, so a scrollbar appears if it's rounded up, so we subtract a number
-      this.scale = ((widthScalar < heightScalar)? widthScalar: heightScalar) - 0.0001;
+      // Scale is rounded, so a scrollbar appears if it's rounded up
+      this.scale = ((widthScalar < heightScalar)? widthScalar: heightScalar);
     }
   },
   created() {
     // on create, we set up resize and run it
-    window.onresize = this.onresize;
+    window.addEventListener("resize", this.onresize);
     this.onresize();
   }
 }
@@ -62,6 +63,14 @@ export default {
 
     position: absolute;
 
-    background-color: aliceblue;
+    background-color: #EDE8E9;
+
+    overflow: visible;
+  }
+
+  #app-container-blur {
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 25px 25px #EDE8E9;
   }
 </style>

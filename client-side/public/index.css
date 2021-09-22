@@ -1,0 +1,9 @@
+body {
+    overflow: hidden;
+}
+
+/* Set default font */
+* {
+    font-family: 'Comfortaa', cursive;
+    color: #3C3C3B;
+}
