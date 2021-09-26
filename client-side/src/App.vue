@@ -1,8 +1,6 @@
 <template>
   <div id="app-container" :style="appContainerStyle">
-    <div id="app-container-blur">
-      <Game></Game>
-    </div>
+    <Game></Game>
   </div>
 </template>
 
@@ -66,9 +64,7 @@ export default {
     background-color: #EDE8E9;
 
     overflow: visible;
-  }
 
-  #app-container-blur {
     width: 100%;
     height: 100%;
     box-shadow: 0 0 25px 25px #EDE8E9;

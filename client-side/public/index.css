@@ -7,3 +7,19 @@ body {
     font-family: 'Comfortaa', cursive;
     color: #3C3C3B;
 }
+/* Set default fill font */
+*:-webkit-autofill::first-line {
+    font-family: 'Comfortaa', cursive;
+    color: #3C3C3B;
+}
+
+/* Animation effects */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}

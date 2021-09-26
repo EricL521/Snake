@@ -7,8 +7,8 @@
           <li v-for="description in descriptions" :key="description.id">{{description.text}}</li>
         </ul>
       </div>
-      <input v-model="nickname" :maxlength="maxNameLength" id="name-input" placeholder="Type a nickname">
-      <button id="play-button" @click="play">Play</button>
+      <input v-model="nickname" :maxlength="maxNameLength" id="name-input" placeholder="Type a nickname" @keydown="onKeyPress">
+      <button ref="playButton" id="play-button" @click="play">Play</button>
     </div>
   </div>
 </template>
@@ -31,6 +31,10 @@ export default {
         {
           id: 2,
           text: "\"This is one SARP game!\" - James Verrico, Professional Gamer of Eric's Disciples"
+        },
+        {
+          id: 3,
+          text: "Sometimes you just gotta sit back, relax, and enjoy a nice Sarp - Brady Mobus, Professional Heat Miser"
         }
       ],
       maxNameLength: 20
@@ -38,14 +42,13 @@ export default {
   },
   methods: {
     play() {
+      this.$emit("changeScreen");
       // contact server with name
+    },
+    onKeyPress(event) {
+      if (event.key === "Enter")
+        this.$refs.playButton.focus();
     }
-  },
-  created() {
-    // document.addEventListener()
-  },
-  mounted() {
-    // console.log(this.$parent);
   }
 }
 </script>
@@ -104,6 +107,9 @@ export default {
   }
   #name-input:focus {
     box-shadow: 0 0 3px 3px #228CDB;
+  }
+  #name-input:-webkit-autofill::first-line {
+    font-size: 30px;
   }
 
   #play-button {
