@@ -15,7 +15,7 @@ class Game {
 
         // settings for the game
         this.defaultSnakeLength = defaultSnakeLength;
-        this.percentEmpty = percentEmpty;
+        this.percentEmpty = percentEmpty / 100;
         this.numApples = numApples;
         this.minMapSize = minMapSize;
 
@@ -34,8 +34,6 @@ class Game {
                 this.addEmptyTile([i, j]);
         for (let i = 0; i < numApples; i ++)
             this.genApple(this.getEmptyTile());
-
-        console.log(this.map);
     }
 
     // returns random key from emptyTiles
@@ -68,7 +66,6 @@ class Game {
 
     // generates an apple at the index (references part of emptytiles)
     genApple(pos) {
-        console.log(typeof pos);
         this.map[pos[0]][pos[1]] = "apple";
     }
 
@@ -124,9 +121,8 @@ class Game {
 
     // main update function, runs every tick
     update() {
-        if (this.emptyTiles.length / (this.map.length * this.map[0].length) < this.percentEmpty) {
+        if (this.emptyTiles.length / (this.map.length * this.map[0].length) < this.percentEmpty)
             this.updateMapSize();
-        }
 
         let snakeHeads = [];
         // update all snakes
@@ -179,28 +175,50 @@ class Game {
 
     // updates map size
     updateMapSize() {
-        let newSize = Math.round(Math.sqrt(this.emptyTiles.length / this.percentEmpty));
-        let eachSide = Math.floor((newSize - this.map.length) / 2);
-        newSize = this.map.length + (eachSide * 2); // update newSize to match eachSide
+        let numEmpty = this.emptyTiles.length;
+        let currentSize = this.map.length;
+
+        // prefered to overshoot than under
+        let eachSide = Math.ceil((Math.sqrt((numEmpty - Math.pow(currentSize, 2)) / (this.percentEmpty - 1)) - currentSize) / (2));
+        let newSize = this.map.length + (eachSide * 2); // update newSize to match eachSide
+
+        // adjust the values in emptyTiles
+        // for adding additional columns
+        this.emptyTiles.map(old => {
+            return [old[0] + eachSide, old[1]];
+        });
 
         for (let i = 0; i < eachSide; i ++) {
             this.map.unshift([]);
-            for (let j = 0; j < newSize; j ++)
+            for (let j = 0; j < currentSize; j ++) {
                 this.map[0].push(null);
+                this.addEmptyTile([eachSide - i - 1, j]);
+            }
         }
         for (let i = 0; i < eachSide; i ++) {
             this.map.push([]);
-            for (let j = 0; j < newSize; j ++)
+            for (let j = 0; j < currentSize; j ++) {
                 this.map[this.map.length - 1].push(null);
+                this.addEmptyTile([this.map.length - 1, j]);
+            }
         }
+
+        // adjust the values in emptyTiles
+        // for adding additional rows
+        this.emptyTiles.map(old => {
+            return [old[0], old[1] + eachSide];
+        });
 
         for (let i = 0; i < newSize; i ++) {
-            for (let j = 0; j < eachSide; j ++)
+            for (let j = 0; j < eachSide; j ++) {
                 this.map[i].unshift(null);
-            for (let j = 0; j < eachSide; j ++)
+                this.addEmptyTile([i, eachSide - j - 1]);
+            }
+            for (let j = 0; j < eachSide; j ++) {
                 this.map[i].push(null);
+                this.addEmptyTile([i, this.map[i].length - 1]);
+            }
         }
-
     }
 
 }

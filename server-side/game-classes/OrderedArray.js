@@ -49,7 +49,7 @@ class OrderedArray {
         let lowerBound = 0;
         let upperBound = this.length - 1;
 
-        while (upperBound - 1 > lowerBound) {
+        while (upperBound > lowerBound + 1) {
             let center = Math.floor((lowerBound + upperBound) / 2);
             let centerTile = this.tiles[center];
             if (this.areEqual(tile, centerTile))
@@ -61,11 +61,17 @@ class OrderedArray {
         }
 
         // upperbound and lowerbound are one apart
-        // if upperbound is equal to or greater than tile, then return it otherwise return lowerbound
-        if (this.areEqual(this.get(upperBound), tile) || this.isGreaterThan(this.get(upperBound), tile))
+        // if upperbound is equal to tile, then return it
+        if (this.areEqual(this.get(upperBound), tile))
             return upperBound;
+        // if lower bound is equal to tile, then return it
+        if (this.areEqual(this.get(lowerBound), tile))
+            return lowerBound;
+        // if it is equal to neither, return upper bound if tile is greater than it
+        if (this.isGreaterThan(tile, this.get(upperBound)))
+            return upperBound;
+        // otherwise, return lowerbound;
         return lowerBound;
-
     }
 
     // add a tile
@@ -90,8 +96,16 @@ class OrderedArray {
 
         if (this.areEqual(tile, this.get(index)))
             this.tiles.splice(index, 1);
-        else
+        else {
+            console.log("tile not found", tile, this.tiles.splice(index - 1, 3));
             throw "tile not in array";
+        }
+    }
+
+    // same as map function in array, but sets the array to the new array
+    // map Function must not change the order of the array
+    map(mapFunction) {
+        this.tiles = this.tiles.map((old) => {return mapFunction(old);});
     }
 }
 
