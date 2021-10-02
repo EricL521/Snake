@@ -7,7 +7,7 @@
           <li v-for="description in descriptions" :key="description.id">{{description.text}}</li>
         </ul>
       </div>
-      <input v-model="nickname" :maxlength="maxNameLength" id="name-input" placeholder="Type a nickname" @keydown="onKeyPress">
+      <input autocomplete="off" v-model="nickname" :maxlength="maxNameLength" id="name-input" placeholder="Type a nickname" @keydown="onKeyPress">
       <button ref="playButton" id="play-button" @click="play">Play</button>
     </div>
   </div>
@@ -42,8 +42,12 @@ export default {
   },
   methods: {
     play() {
-      this.$emit("changeScreen");
       // contact server with name
+      socket.emit("join", this.nickname, (map) => {
+        this.$emit("mapInfo", map);
+
+        this.$emit("changeScreen");
+      });
     },
     onKeyPress(event) {
       if (event.key === "Enter")

@@ -21,6 +21,9 @@
     "eslint-plugin-vue": "^7.0.0"
   },
   "eslintConfig": {
+    "globals": {
+      "socket": "readonly"
+    },
     "root": true,
     "env": {
       "node": true

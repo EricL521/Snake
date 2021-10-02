@@ -1,6 +1,6 @@
 <template>
   <div id="app-container" :style="appContainerStyle">
-    <Game></Game>
+    <Game :defaultDimensions="[defaultWidth, defaultHeight]"></Game>
   </div>
 </template>
 

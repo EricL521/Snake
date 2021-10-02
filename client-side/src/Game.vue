@@ -1,9 +1,9 @@
 <template>
   <transition name="fade">
-    <StartScreen v-if="startScreenVisible" @changeScreen="gameState = 1;"></StartScreen>
+    <StartScreen v-if="startScreenVisible" @changeScreen="gameState = 1;" @mapInfo="updateMap"></StartScreen>
   </transition>
   <transition name="fade">
-    <GameScreen v-if="gameScreenVisible"></GameScreen>
+    <GameScreen v-if="gameScreenVisible" :map="map" :defaultDimensions="defaultDimensions"></GameScreen>
   </transition>
 </template>
 
@@ -14,6 +14,9 @@ import GameScreen from "./components/game_screen/GameScreen";
 // Manages game states ex. start screen, respawn screen, game screen
 export default {
   name: "Game",
+  props: {
+    defaultDimensions: Array
+  },
   components: {
     GameScreen,
     StartScreen
@@ -25,12 +28,13 @@ export default {
           "start-screen",
           "game-screen",
           "respawn-screen"
-      ]
+      ],
+      map: []
     }
   },
   methods: {
-    setGameState(num) {
-      this.gameState = num;
+    updateMap(data) {
+      this.map = data;
     }
   },
   computed: {
@@ -39,6 +43,9 @@ export default {
     },
     gameScreenVisible() {
       return this.gameStates[this.gameState] === 'game-screen';
+    },
+    gameScreenMap() {
+      return this.map;
     }
   }
 }
