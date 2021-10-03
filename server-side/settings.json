@@ -1,0 +1,6 @@
+{
+  "screenSize": [15, 15],
+  "startingSnakeSize": 3,
+  "percentMapEmpty": 80,
+  "numApples": 10
+}

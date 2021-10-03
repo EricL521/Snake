@@ -7,10 +7,10 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-const screenSize = [5, 5];
+const settings = require("./settings.json");
 
 const {Game} = require('./game-classes/Game');
-const game = new Game(3, 50, screenSize, 5);
+const game = new Game(settings.startingSnakeSize, settings.percentMapEmpty, settings.screenSize, settings.numApples);
 const tickSpeed = 1000; // once every tickspeed ms
 let updater = setInterval(() => {
     game.update();
