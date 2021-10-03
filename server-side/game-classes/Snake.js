@@ -46,12 +46,9 @@ class Snake {
     // kills the snake
     // this is run after the snake has grown, so it moves the snake back one
     killSnake() {
-        // flip direction and reverse snake
-        this.snake.reverse();
-        this.direction = [this.direction[0] * -1, this.direction[1] * -1];
-
-        // move snake backwards one (the direction got reversed)
-        this.update();
+        // add back tail and remove head
+        this.growSnake();
+        this.snake.pop();
 
         this.dead = true;
     }
@@ -82,7 +79,7 @@ class Snake {
                     color: this.color[(this.snake.length - i - 1) % (this.color.length)],
                     text: this.name[(this.snake.length - i - 1) % (this.name.length)]
                 };
-        throw position + " not in array";
+        throw position + " not in " + this.snake;
     }
 
     // returns whether tile2 and 2 are equal
