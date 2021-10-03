@@ -1,7 +1,9 @@
 <template>
-  <div id="game-screen">
-    <div class="game-screen-row" v-for="(row, index) in this.game.map" :key="index">
-      <GameTile v-for="(tile, index) in row" :key="index" :size=tileSize :type="tile"></GameTile>
+  <div id="game-screen-parent">
+    <div id="game-screen" :style="gameScreenWidth">
+      <div class="game-screen-column" :style="gameScreenHeight" v-for="(column, index) in this.gameMap" :key="index">
+        <GameTile v-for="(tile, index) in column" :key="index" :size=tileSize :type="tile"></GameTile>
+      </div>
     </div>
   </div>
 </template>
@@ -21,38 +23,53 @@ export default {
   },
   data() {
     return {
-      game: new Game(this.map)
+      game: new Game(this),
+      gameMap: this.map // otherwise vue won't update
     }
   },
   computed: {
     tileSize() {
-      let maxSizeX = this.defaultDimensions[0] / this.map[0].length;
-      let maxSizeY = this.defaultDimensions[1] / this.map.length;
+      let maxSizeX = this.defaultDimensions[0] / this.gameMap[0].length;
+      let maxSizeY = this.defaultDimensions[1] / this.gameMap.length;
 
       return (maxSizeX < maxSizeY)? maxSizeX: maxSizeY;
+    },
+    gameScreenWidth() {
+      return {
+        "width" : this.tileSize * this.gameMap.length + "px"
+      }
+    },
+    gameScreenHeight() {
+      return {
+        "height": this.tileSize * this.gameMap[0].length
+      };
     }
-  },
-  mounted() {
-    console.log(this.game.map);
   }
 }
 </script>
 
 <style scoped>
-  #game-screen {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-
-  .game-screen-row {
+  #game-screen-parent {
     width: 100%;
     height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  #game-screen {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+  .game-screen-column {
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
 </style>

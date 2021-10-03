@@ -10,11 +10,20 @@ const io = new Server(server);
 const screenSize = [5, 5];
 
 const {Game} = require('./game-classes/Game');
-const game = new Game(3, 90, screenSize, 5);
+const game = new Game(3, 50, screenSize, 5);
 const tickSpeed = 1000; // once every tickspeed ms
 let updater = setInterval(() => {
     game.update();
+    // update everyone's screens
+    let iterator = game.snakeMap.keys();
+    for (let i = 0; i < game.snakeMap.size; i ++)
+        updateScreen(iterator.next().value);
 }, tickSpeed);
+
+// updates a person's screens
+const updateScreen = (socketID) => {
+    io.to(socketID).emit("newMap", game.getScreen(socketID, screenSize));
+};
 
 io.on("connection", socket => {
     socket.on("join", (name, callback) => {
@@ -22,6 +31,16 @@ io.on("connection", socket => {
 
         // send info for game
         callback(game.getScreen(socket.id, screenSize));
+    });
+
+    socket.on("newDir", (dir) => {
+        let direction = (dir === "right")? [1, 0] :
+            (dir === "left")? [-1, 0] :
+                (dir === "up")? [0, -1] :
+                    (dir === "down")? [0, 1] : "fail";
+
+        if (direction !== "fail")
+            game.setSnakeDir(direction, socket.id);
     });
 });
 
