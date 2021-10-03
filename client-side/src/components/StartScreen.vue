@@ -1,6 +1,6 @@
 <template>
   <div id="start-screen-parent">
-    <div id="start-screen">
+    <div id="start-screen" :style="[startScreenDimensionsStyle, startScreenScale]">
       <div id="title">
         <h1 id="name">Sarp</h1>
         <ul>
@@ -16,6 +16,9 @@
 <script>
 export default {
   name: "StartScreen",
+  props: {
+    screenSize: Array
+  },
   data() {
     return {
       nickname: "",
@@ -37,7 +40,8 @@ export default {
           text: "Sometimes you just gotta sit back, relax, and enjoy a nice Sarp - Brady Mobus, Professional Heat Miser"
         }
       ],
-      maxNameLength: 20
+      maxNameLength: 20,
+      startScreenDimensions: [960, 810],
     }
   },
   methods: {
@@ -53,24 +57,28 @@ export default {
       if (event.key === "Enter")
         this.$refs.playButton.focus();
     }
+  },
+  computed: {
+    startScreenScale() {
+      let maxXScale = this.screenSize[0] / this.startScreenDimensions[0] * 0.8;
+      let maxYScale = this.screenSize[1] / this.startScreenDimensions[1] * 0.8;
+      let scale = (maxXScale < maxYScale)? maxXScale: maxYScale;
+
+      return {
+        transform: "scale(" + scale + ")"
+      };
+    },
+    startScreenDimensionsStyle() {
+      return {
+        "width": this.startScreenDimensions[0] + "px",
+        "height": this.startScreenDimensions[1] + "px"
+      }
+    }
   }
 }
 </script>
 
 <style scoped>
-  #start-screen {
-    width: 960px;
-    height: 810px;
-    border-radius: 30px;
-    background-color: #E2DADB;
-    box-shadow: 8px 8px 5px 5px #3C3C3B;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    flex-direction: column;
-  }
-
   #start-screen-parent {
     width: 100%;
     height: 100%;
@@ -82,6 +90,23 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    overflow: hidden;
+  }
+
+  #start-screen {
+    position: absolute;
+
+    border-radius: 30px;
+    background-color: #E2DADB;
+    box-shadow: 8px 8px 5px 5px #3C3C3B;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: column;
+
+    transform-origin: center center;
   }
 
   #title {

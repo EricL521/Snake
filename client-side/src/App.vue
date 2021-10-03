@@ -1,72 +1,74 @@
 <template>
-  <div id="app-container" :style="appContainerStyle">
-    <Game :defaultDimensions="[defaultWidth, defaultHeight]"></Game>
+  <div id="app-container">
+    <transition name="fade">
+      <StartScreen v-if="startScreenVisible" @changeScreen="gameState = 1;" @mapInfo="updateMap" :screenSize="screenSize"></StartScreen>
+    </transition>
+    <transition name="fade">
+      <GameScreen v-if="gameScreenVisible" :map="map" :screenSize="screenSize"></GameScreen>
+    </transition>
   </div>
 </template>
 
 <script>
-import Game from "./Game";
+import StartScreen from "./components/StartScreen";
+import GameScreen from "./components/game_screen/GameScreen";
 
-// Centers and resizes app accordingly
+// Manages game states ex. start screen, respawn screen, game screen
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Game
+    GameScreen,
+    StartScreen
   },
   data() {
     return {
-      scale: 1,
-      defaultWidth: 1920,
-      defaultHeight: 1080,
-      windowWidth: 1920,
-      windowHeight: 1080
-    }
-  },
-  computed: {
-    // returns css object
-    appContainerStyle() {
-      return {
-        width: this.defaultWidth + "px",
-        height: this.defaultHeight + "px",
-        transform: "scale(" + this.scale + ")",
-        left: (this.windowWidth - this.scale * this.defaultWidth) / 2 + "px",
-        top: (this.windowHeight - this.scale * this.defaultHeight) / 2 + "px",
-      };
+      gameState: 0,
+      gameStates: [
+        "start-screen",
+        "game-screen",
+        "respawn-screen"
+      ],
+      map: [],
+      screenSize: []
     }
   },
   methods: {
-    // updates variables, set up in created()
-    onresize() {
-      this.windowWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      this.windowHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
-
-      let widthScalar = this.windowWidth / this.defaultWidth;
-      let heightScalar = this.windowHeight / this.defaultHeight;
-
-      // Scale is rounded, so a scrollbar appears if it's rounded up
-      this.scale = ((widthScalar < heightScalar)? widthScalar: heightScalar);
+    updateMap(data) {
+      this.map = data;
+    },
+    updateScreenSize() {
+      this.screenSize[0] = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      this.screenSize[1] = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
     }
   },
-  created() {
-    // on create, we set up resize and run it
-    window.addEventListener("resize", this.onresize);
-    this.onresize();
+  computed: {
+    startScreenVisible() {
+      return this.gameStates[this.gameState] === 'start-screen';
+    },
+    gameScreenVisible() {
+      return this.gameStates[this.gameState] === 'game-screen';
+    },
+    gameScreenMap() {
+      return this.map;
+    }
+  },
+  beforeMount() {
+    this.updateScreenSize();
+    window.onresize = () => {this.updateScreenSize();};
   }
 }
 </script>
 
-<style>
+<style scoped>
   #app-container {
-    transform-origin: top left;
-
-    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0px;
+    top: 0px;
 
     background-color: #EDE8E9;
 
-    overflow: visible;
-
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 25px 25px #EDE8E9;
+    overflow: auto;
   }
 </style>

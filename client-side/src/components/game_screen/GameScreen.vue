@@ -16,7 +16,7 @@ export default {
   name: "GameScreen",
   props: {
     map: Array,
-    defaultDimensions: Array
+    screenSize: Array
   },
   components: {
     GameTile
@@ -29,8 +29,8 @@ export default {
   },
   computed: {
     tileSize() {
-      let maxSizeX = this.defaultDimensions[0] / this.gameMap[0].length;
-      let maxSizeY = this.defaultDimensions[1] / this.gameMap.length;
+      let maxSizeX = this.screenSize[0] / this.gameMap[0].length;
+      let maxSizeY = this.screenSize[1] / this.gameMap.length;
 
       return (maxSizeX < maxSizeY)? maxSizeX: maxSizeY;
     },
@@ -51,7 +51,7 @@ export default {
 <style scoped>
   #game-screen-parent {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
