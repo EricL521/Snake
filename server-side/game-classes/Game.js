@@ -20,7 +20,7 @@ class Game {
         this.minMapSize = minMapSize;
 
         // set up map
-        // values would be "apple", null, and "snake"
+        // values would be "apple", null, and snake object
         this.map = [];
         for (let i = 0 ; i < minMapSize[0]; i ++) {
             this.map.push([]);
@@ -38,14 +38,14 @@ class Game {
 
 
     // adds a snake
-    addSnake(name, socketID) {
+    addSnake(name, color, socketID) {
         let spawnPos = this.getEmptyTile();
-        let snake = new Snake(name, this.defaultSnakeLength, spawnPos, [0, 0], socketID);
+        let snake = new Snake(name, color, this.defaultSnakeLength, spawnPos, [0, 0], socketID);
         this.liveSnakes.push(snake);
         this.snakeMap.set(socketID, snake);
 
         // update maps
-        this.map[spawnPos[0]][spawnPos[1]] = "snake";
+        this.map[spawnPos[0]][spawnPos[1]] = snake;
     }
 
     // updates the direction for a snake
@@ -95,12 +95,33 @@ class Game {
             let y = topLeft[1] + j;
 
             if (y < column.length)
-                returnColumn.push(column[y]);
+                returnColumn.push(this.getColor([columnNumber, y]));
             else
-                returnColumn.unshift(column[topLeft[1] - j + (column.length - 1 - topLeft[1])]);
+                returnColumn.unshift(this.getColor([columnNumber, topLeft[1] - j + (column.length - 1 - topLeft[1])]));
         }
 
         return returnColumn;
+    }
+
+    // returns the color and text
+    getColor(position) {
+        let value = this.map[position[0]][position[1]];
+
+        // if it's a snake
+        if (value instanceof Snake)
+            return value.getValue(position);
+        // if it's empty
+        else if (value === null)
+            return {
+                color: "transparent",
+                text: ""
+            };
+        // if it's an apple
+        else
+            return {
+                color: "#DD1155",
+                text: ""
+            };
     }
 
 
@@ -163,7 +184,7 @@ class Game {
                 if (mapValue !== null) {
                     if (mapValue === "apple")
                         snake.growSnake();
-                    else if (!snake.immune && mapValue === "snake") {
+                    else if (!snake.immune && mapValue instanceof Snake) {
                         snake.killSnake();
                         this.deadSnakes.push(this.liveSnakes.splice(i, 1)[0]);
                     }
@@ -172,7 +193,7 @@ class Game {
                 // update game map, emptytiles, appletiles, and snaketiles
                 // dead snakes end up not moving
                 if (!snake.dead) {
-                    this.map[snakeHeads[i][0]][snakeHeads[i][1]] = "snake";
+                    this.map[snakeHeads[i][0]][snakeHeads[i][1]] = snake;
 
                     if (!this.areEqual(snake.lastRemoved, snake.getTail())) {
                         this.map[snake.lastRemoved[0]][snake.lastRemoved[1]] = null;

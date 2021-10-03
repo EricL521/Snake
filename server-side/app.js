@@ -27,7 +27,7 @@ const updateScreen = (socketID) => {
 
 io.on("connection", socket => {
     socket.on("join", (name, callback) => {
-        game.addSnake(name, socket.id);
+        game.addSnake(name, ["#588B8B"], socket.id);
 
         // send info for game
         callback(game.getScreen(socket.id, screenSize));

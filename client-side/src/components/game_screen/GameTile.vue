@@ -9,7 +9,7 @@ export default {
   name: "GameTile",
   props: {
     size: Number,
-    type: String,
+    color: String,
     text: String
   },
   computed: {
@@ -21,7 +21,7 @@ export default {
     },
     backgroundColor() {
       return {
-        "background-color": (this.type === "apple")? "#DD1155" : (this.type === "snake")? "#588B8B": "transparent",
+        "background-color": this.color,
       };
     },
     textStyle() {

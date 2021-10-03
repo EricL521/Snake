@@ -2,7 +2,7 @@
   <div id="game-screen-parent">
     <div id="game-screen" :style="gameScreenWidth">
       <div class="game-screen-column" :style="gameScreenHeight" v-for="(column, index) in this.gameMap" :key="index">
-        <GameTile v-for="(tile, index) in column" :key="index" :size=tileSize :type="tile"></GameTile>
+        <GameTile v-for="(tile, index) in column" :key="index" :size=tileSize :color="tile.color" :text="tile.text"></GameTile>
       </div>
     </div>
   </div>
