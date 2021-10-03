@@ -28,6 +28,8 @@ class Game {
     }
 
     updateMap(newMap) {
-        this.gameScreen.gameMap = newMap;
+        this.gameScreen.gameMap = newMap.map;
+        this.gameScreen.edges = newMap.edges;
     }
+
 }

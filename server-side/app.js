@@ -11,14 +11,13 @@ const settings = require("./settings.json");
 
 const {Game} = require('./game-classes/Game');
 const game = new Game(settings.startingSnakeSize, settings.percentMapEmpty, settings.screenSize, settings.numApples);
-const tickSpeed = 1000; // once every tickspeed ms
 let updater = setInterval(() => {
     game.update();
     // update everyone's screens
     let iterator = game.snakeMap.keys();
     for (let i = 0; i < game.snakeMap.size; i ++)
         updateScreen(iterator.next().value);
-}, tickSpeed);
+}, settings.tickSpeed);
 
 // updates a person's screens
 const updateScreen = (socketID) => {

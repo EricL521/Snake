@@ -56,6 +56,8 @@ class Game {
     // gets the array of tiles which will be displayed on the client screen
     // screenSize is the dimensions of the number of tiles, [x, y]
     // screenSize must be odd
+    // returns map: array of tiles, edges: boolean array of length 4 in order up left down right
+    // returns a JSON object
     getScreen(socketID, screenSize) {
         if (screenSize[0] % 2 === 0 || screenSize[1] % 2 === 0)
             throw "screenSize must be odd";
@@ -82,7 +84,18 @@ class Game {
                 returnMap.unshift(this.getScreenCol(topLeft, topLeft[0] - i + (this.map.length - 1 - topLeft[0]), screenSize[1]));
         }
 
-        return returnMap;
+        // get edges
+        let edges = [
+            topLeft[1] - ((topLeft[1] + screenSize[1] > this.map[0].length)? topLeft[1] + screenSize[1] - this.map[0].length : 0) <= 0,
+            topLeft[0] - ((topLeft[0] + screenSize[0] > this.map.length)? topLeft[0] + screenSize[0] - this.map.length : 0) <= 0,
+            topLeft[1] + screenSize[1] >= this.map[0].length,
+            topLeft[0] + screenSize[0] >= this.map.length
+        ];
+
+        return {
+            map: returnMap,
+            edges: edges
+        };
     }
 
     // returns one row of the screen
