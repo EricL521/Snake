@@ -22,7 +22,7 @@ let updater = setInterval(() => {
 
 // updates a person's screens
 const updateScreen = (socketID) => {
-    io.to(socketID).emit("newMap", game.getScreen(socketID, screenSize));
+    io.to(socketID).emit("newMap", game.getScreen(socketID, settings.screenSize));
 };
 
 io.on("connection", socket => {
@@ -30,7 +30,7 @@ io.on("connection", socket => {
         game.addSnake(name, ["#588B8B"], socket.id);
 
         // send info for game
-        callback(game.getScreen(socket.id, screenSize));
+        callback(game.getScreen(socket.id, settings.screenSize));
     });
 
     socket.on("newDir", (dir) => {
