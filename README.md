@@ -1,3 +1,3 @@
 # Snake
-Online snake game
-Going to have abilities hopefully
+* Online snake game
+* Going to have abilities hopefully
