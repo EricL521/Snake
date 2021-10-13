@@ -12,11 +12,14 @@ const settings = require("./settings.json");
 const {Game} = require('./game-classes/Game');
 const game = new Game(settings.startingSnakeSize, settings.percentMapEmpty, settings.screenSize, settings.numApples);
 let updater = setInterval(() => {
-    game.update();
+    let newDeadSnakes = game.update();
     // update everyone's screens
     let iterator = game.snakeMap.keys();
     for (let i = 0; i < game.snakeMap.size; i ++)
         updateScreen(iterator.next().value);
+    // notify dead players
+    for (let i = 0; i < newDeadSnakes.length; i ++)
+        killPlayer(newDeadSnakes[i].socketID);
 }, settings.tickSpeed);
 
 // updates a person's screens
@@ -24,11 +27,23 @@ const updateScreen = (socketID) => {
     io.to(socketID).emit("newMap", game.getScreen(socketID, settings.screenSize));
 };
 
+// sends out the message that someone died
+const killPlayer = (socketID) => {
+    io.to(socketID).emit("snakeDeath");
+};
+
 io.on("connection", socket => {
     socket.on("join", (name, callback) => {
         game.addSnake(name, ["#588B8B"], socket.id);
 
         // send info for game
+        callback(game.getScreen(socket.id, settings.screenSize));
+    });
+
+    socket.on("respawn", (callback) => {
+        game.respawnSnake(socket.id);
+
+        // callback with new map
         callback(game.getScreen(socket.id, settings.screenSize));
     });
 

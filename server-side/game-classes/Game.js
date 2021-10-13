@@ -1,5 +1,6 @@
 let {Snake} = require("./Snake");
 let {OrderedArray} = require("./OrderedArray");
+let {SnakeBody} = require("./SnakeBody");
 
 class Game {
     // actual game code
@@ -9,7 +10,7 @@ class Game {
         // living snakes
         // NOTE: deadSnakes are not updated
         this.liveSnakes = [];
-        this.deadSnakes = [];
+        this.deadSnakes = new Map();
         // key: socket.id, value: snake object
         this.snakeMap = new Map();
 
@@ -36,7 +37,6 @@ class Game {
             this.genApple(this.getEmptyTile());
     }
 
-
     // adds a snake
     addSnake(name, color, socketID) {
         let spawnPos = this.getEmptyTile();
@@ -48,9 +48,27 @@ class Game {
         this.map[spawnPos[0]][spawnPos[1]] = snake;
     }
 
+    // respawns a snake
+    respawnSnake(socketID) {
+        let snake = this.snakeMap.get(socketID);
+
+        let removedPart = snake.respawn();
+        this.deadSnakes.delete(snake);
+        this.liveSnakes.push(snake);
+
+        let snakeBody = new SnakeBody(removedPart);
+        for (let i = 0; i < removedPart.length; i ++)
+            this.map[removedPart[i].position[0]][removedPart[i].position[1]] = snakeBody;
+    }
+
     // updates the direction for a snake
     setSnakeDir(newDir, socketID) {
-        this.snakeMap.get(socketID).updateDirection(newDir);
+        try {
+            this.snakeMap.get(socketID).updateDirection(newDir);
+        }
+        catch (e) {
+            console.log(this.snakeMap, socketID);
+        }
     }
 
     // gets the array of tiles which will be displayed on the client screen
@@ -120,21 +138,21 @@ class Game {
     getColor(position) {
         let value = this.map[position[0]][position[1]];
 
-        // if it's a snake
-        if (value instanceof Snake)
-            return value.getValue(position);
+        // if it's an apple
+        if (value === "apple")
+            return {
+                color: "#DD1155",
+                text: ""
+            };
         // if it's empty
         else if (value === null)
             return {
                 color: "transparent",
                 text: ""
             };
-        // if it's an apple
+        // if it's a snake
         else
-            return {
-                color: "#DD1155",
-                text: ""
-            };
+            return value.getValue(position);
     }
 
 
@@ -170,9 +188,13 @@ class Game {
     }
 
     // main update function, runs every tick
+    // returns newly killed snakes
     update() {
         if (this.emptyTiles.length / (this.map.length * this.map[0].length) < this.percentEmpty)
             this.updateMapSize();
+
+        // new dead snakes will be told that they are dead
+        let newDeadSnakes = [];
 
         let snakeHeads = [];
         // update all snakes
@@ -186,10 +208,8 @@ class Game {
                 snakeHeads[i][0] >= this.map.length ||
                 snakeHeads[i][1] < 0 ||
                 snakeHeads[i][1] >= this.map.length
-            ) {
-                this.liveSnakes[i].killSnake();
-                this.deadSnakes.push(this.liveSnakes.splice(i, 1)[0]);
-            }
+            )
+                newDeadSnakes.push(this.killSnakes(i));
             else {
                 // continue updating snakes
                 let mapValue = this.map[snakeHeads[i][0]][snakeHeads[i][1]];
@@ -197,10 +217,8 @@ class Game {
                 if (mapValue !== null) {
                     if (mapValue === "apple")
                         snake.growSnake();
-                    else if (!snake.immune && mapValue instanceof Snake) {
-                        snake.killSnake();
-                        this.deadSnakes.push(this.liveSnakes.splice(i, 1)[0]);
-                    }
+                    else if (!snake.immune)
+                        newDeadSnakes.push(this.killSnakes(i));
                 }
 
                 // update game map, emptytiles, appletiles, and snaketiles
@@ -223,6 +241,18 @@ class Game {
 
         }
 
+        return newDeadSnakes;
+    }
+
+    // kill snakes
+    // index of living snakes
+    // returns the snake
+    killSnakes(index) {
+        let snake = this.liveSnakes.splice(index, 1)[0];
+        snake.killSnake();
+        this.deadSnakes.set(snake, 0);
+
+        return snake;
     }
 
     // updates map size

@@ -26,13 +26,35 @@ class Snake {
             this.direction = [0, 0]; // default starts still
     }
 
+    // respawns the snake
+    respawn() {
+        this.dead = false;
+
+        // reset direction
+        this.direction = [0, 0];
+        // snake is immune until movement
+        this.immune = true;
+
+        // get the to be removed part
+        let snakeBody = [];
+        for (let i = Math.floor(this.snake.length / 2); i < this.snake.length; i ++)
+            snakeBody.push(this.getValueIndex(i));
+
+        // flip snake
+        this.snake.reverse();
+        // remove the back part
+        this.snake.splice(0, Math.ceil(this.snake.length / 2));
+
+        return snakeBody;
+    }
+
     // moves snake in the current direction
     update() {
-        // remove first
-        this.lastRemoved = this.snake.shift();
-
         let head = this.snake[this.snake.length - 1];
         this.snake.push([head[0] + this.direction[0], head[1] + this.direction[1]]);
+
+        // remove first
+        this.lastRemoved = this.snake.shift();
 
         // return new head position
         return this.getPosition();
@@ -79,7 +101,16 @@ class Snake {
                     color: this.color[(this.snake.length - i - 1) % (this.color.length)],
                     text: this.name[(this.snake.length - i - 1) % (this.name.length)]
                 };
-        throw position + " not in " + this.snake;
+        throw position + " not in " + JSON.stringify(this.snake);
+    }
+
+    // get value by index
+    getValueIndex(index) {
+        return {
+            position: this.snake[index],
+            color: this.color[(this.snake.length - index - 1) % (this.color.length)],
+            text: this.name[(this.snake.length - index - 1) % (this.name.length)]
+        };
     }
 
     // returns whether tile2 and 2 are equal

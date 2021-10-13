@@ -29,6 +29,14 @@ export default {
       edges: this.map.edges
     }
   },
+  methods: {
+    onDeath() {
+      this.$emit("playerDied");
+    },
+    onRespawn() {
+      this.game.respawn();
+    }
+  },
   computed: {
     tileSize() {
       let maxSizeX = this.screenSize[0] / this.gameMap[0].length;
@@ -63,7 +71,12 @@ export default {
         "box-shadow": boxShadow
       };
     }
-
+  },
+  watch: {
+    map(newVal) {
+      this.gameMap = newVal.map;
+      this.edges = newVal.edges;
+    }
   }
 }
 </script>
